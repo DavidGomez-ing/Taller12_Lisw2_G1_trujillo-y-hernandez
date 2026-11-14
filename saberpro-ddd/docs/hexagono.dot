@@ -1,0 +1,37 @@
+digraph G { rankdir=LR; dpi=200; bgcolor=white; pad=0.2; nodesep=0.45; ranksep=0.7; compound=true;
+ node [shape=box, style="rounded,filled", fontname="Liberation Sans", fontsize=11, margin="0.16,0.10"];
+ edge [fontname="Liberation Sans", fontsize=9];
+
+ subgraph cluster_in { label="Adaptadores de entrada (driving)"; fontname="Liberation Sans"; style="rounded,filled"; fillcolor="#EEF3FA"; color="#7A9CC6";
+   REST [label="PreguntaController\n(infrastructure.adapter.in.web)", fillcolor="#DCE9F7"];
+ }
+
+ subgraph cluster_core { label="NÚCLEO (domain + application) — Java puro"; fontname="Liberation Sans"; style="rounded,filled"; fillcolor="#FFFBEA"; color="#C9A227";
+   subgraph cluster_pin { label="domain.ports.inbound"; fontname="Liberation Sans"; style="rounded,dashed"; color="#999999"; fillcolor="#FFFBEA";
+     UC1 [label="«puerto entrada»\nCrearPreguntaUseCase", fillcolor="#FFF2CC"];
+     UC2 [label="«puerto entrada»\nConsultarPreguntaUseCase", fillcolor="#FFF2CC"];
+   }
+   SVC [label="PreguntaService\n(application.service)", fillcolor="#FDE9B8"];
+   DOM [label="Pregunta (Aggregate Root)\nEnunciado · Justificacion\nOpcionRespuesta · EstadoPregunta\n(domain.model)", fillcolor="#F8DDE0"];
+   subgraph cluster_pout { label="domain.ports.outbound"; fontname="Liberation Sans"; style="rounded,dashed"; color="#999999"; fillcolor="#FFFBEA";
+     P1 [label="«puerto salida»\nPreguntaRepositoryPort\nsave · findById · findAll", fillcolor="#FFF2CC"];
+     P2 [label="«puerto salida»\nNotificacionPort", fillcolor="#FFF2CC"];
+   }
+ }
+
+ subgraph cluster_out { label="Adaptadores de salida (driven)"; fontname="Liberation Sans"; style="rounded,filled"; fillcolor="#EEF7EA"; color="#7DB36B";
+   JPA [label="JpaQuestionAdapter\n+ PreguntaJpaEntity\n(Spring Data JPA)", fillcolor="#E4F2DD"];
+   MEM [label="InMemoryQuestionAdapter\n(HashMap) — intercambiable", fillcolor="#E4F2DD"];
+   LOG [label="LogNotificacionAdapter", fillcolor="#E4F2DD"];
+   H2 [label="H2", shape=cylinder, fillcolor="#FFFFFF"];
+ }
+
+ REST -> UC1 [label="invoca"]; REST -> UC2;
+ SVC -> UC1 [style=dashed, arrowhead=empty]; SVC -> UC2 [style=dashed, arrowhead=empty];
+ SVC -> DOM [label="opera sobre"];
+ SVC -> P1 [label="usa"]; SVC -> P2 [label="usa"];
+ JPA -> P1 [style=dashed, arrowhead=empty];
+ MEM -> P1 [style=dashed, arrowhead=empty];
+ LOG -> P2 [style=dashed, arrowhead=empty];
+ JPA -> H2 [label="persiste en"];
+}

@@ -1,0 +1,5 @@
+# Perfil "memory": activa el InMemoryQuestionAdapter sin tocar el codigo.
+#   mvn spring-boot:run -Dspring-boot.run.profiles=memory
+saberpro:
+  persistence:
+    adapter: memory
